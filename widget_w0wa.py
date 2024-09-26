@@ -38,12 +38,13 @@ fig, (ax1, sax) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [3, 1]},
 
 
 
-l = (1 - np.exp(-0.5), 1 - np.exp(-2))
+#l = (1 - np.exp(-0.5), 1 - np.exp(-2))
+l = (0.68, 0.95)
 
 lgth = 0.1
 wdth = 0.05
 
-SAVAS = discrete_cmap('cmr.savanna_r', 9)
+SAVAS = discrete_cmap('cmr.chroma_r', 9)
 invisible_axis(sax)
 # define the set of systematics sliders
 
@@ -123,6 +124,7 @@ progevol_mb_slider = Slider(plt.axes([0.8, 0.8, lgth, wdth]),
                                                 '':'|', 'edgewidth':2})
 
 #button = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
+shift_dict = pd.read_pickle('shifts.pkl')
 
 def update(val):
     r = calib_slider.val
@@ -134,8 +136,8 @@ def update(val):
     r7 = om_slider.val 
     r8 = progevol_mb_slider.val 
 
-    fac1 = 0.14 * (r / 0.02) 
-    fac2 = -0.37 * (r / 0.02)
+    fac1 = shift_dict['None0.02'][0] * (r / 0.02) 
+    fac2 = shift_dict['None0.02'][1] * (r / 0.02)
     print(fac1, fac2)
 
     #ax1.tick_params(labelsize=14, direction='in', length=7, width=3)
@@ -143,28 +145,28 @@ def update(val):
     ax1.cla()
     # for the dRv/dz slope how much does w0-wa change (the scaling is to the dmu/dz slope)
     # this is because dRV/ dz -> dmu/dz
-    fac3 =  -0.04 * (r2 / 0.5) 
-    fac4 = -0.36 * (r2 / 0.5) 
+    fac3 =  shift_dict['dRV/dz'][0] * (r2 / 0.5) 
+    fac4 =  shift_dict['dRV/dz'][1] * (r2 / 0.5) 
     
-    fac5 = 0.01 * r3
-    fac6 = -0.36 * r3
+    fac5 = shift_dict['MWExt'][0] * r3
+    fac6 = shift_dict['MWExt'][1] * r3
 
     fac_smooth = 2.31 * r4 + 0.412
     
     # for the IG Dust value, the slope is a large number since the shift is (
     # (quasi-) linear with the dust density not its log. However, the step here is in log density
     # so need to take the exponent of the value
-    fac7 = -3182 * pow(10, r5)
-    fac8 = 8071 * pow(10, r5)
+    fac7 = shift_dict['IG_Dust5e-06'][0] * pow(10, r5)
+    fac8 = shift_dict['IG_Dust5e-06'][1] * pow(10, r5)
 
-    fac9 =  - (r6 - 2.3) * 0.025 / 0.1
-    fac10 =  (r6 - 2.3) * 0.125 / 0.1
+    fac9 =  - (r6 - 2.3) * shift_dict['prog_evol_x10.8'][0] / 0.1
+    fac10 =  (r6 - 2.3) * shift_dict['prog_evol_x10.8'][1] / 0.1
     
-    fac11 = - (r7 / 0.01) * 0.02
-    fac12 = - (r7 / 0.01) * 0.18
+    fac11 = - (r7 / 0.02) * shift_dict['prog_evol_mb0.02'][0]#0.02
+    fac12 = - (r7 / 0.02) * shift_dict['prog_evol_mb0.02'][1]
 
-    fac13 = - (r8 / 0.01) * 0.002 
-    fac14 = - (r8 / 0.01) * 0.1
+    fac13 = - (r8 / 0.01) * shift_dict['None0.0omMiss0.01'][0] 
+    fac14 = - (r8 / 0.01) * shift_dict['None0.0omMiss0.01'][1]
 
     fid_fac1_test = fid[:,3] + fac1 + fac3 + fac5 + fac7 + fac9 + fac11 + fac13 
     fid_fac2_test = fid[:,4]  + fac2 + fac4 + fac6  + fac8 + fac10 + fac12 + fac14 
@@ -180,7 +182,7 @@ def update(val):
 
     #The contour levels themselves in green
     corner.hist2d(fid_fac1, fid_fac2, smooth=1, levels=l, ax=ax1,
-                      color="#225339", zorder=2,
+                      color="#225339", zorder=2, 
                       plot_datapoints=False, plot_density=False)
 
     #Hexbins underneath to show population
