@@ -6,6 +6,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np 
 import matplotlib.pyplot as plt
 import cmasher as cmr
+import pandas as pd 
 import matplotlib
 
 plt.rcParams["font.family"] = "Helvetica"
@@ -145,8 +146,8 @@ def update(val):
     ax1.cla()
     # for the dRv/dz slope how much does w0-wa change (the scaling is to the dmu/dz slope)
     # this is because dRV/ dz -> dmu/dz
-    fac3 =  shift_dict['dRV/dz'][0] * (r2 / 0.5) 
-    fac4 =  shift_dict['dRV/dz'][1] * (r2 / 0.5) 
+    fac3 =  shift_dict['RV-z'][0] * (r2 / 0.5) 
+    fac4 =  shift_dict['RV-z'][1] * (r2 / 0.5) 
     
     fac5 = shift_dict['MWExt'][0] * r3
     fac6 = shift_dict['MWExt'][1] * r3
